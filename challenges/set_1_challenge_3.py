@@ -33,6 +33,8 @@ FREQUENCIES = {
 	'z': 0.00074
 }
 
+charspace = string.ascii_letters + string.digits + ",.' :\n"
+
 def string_xor(input_string, int_key):
 	return ''.join(map(lambda x: chr(x ^ int_key), input_string))
 
@@ -54,31 +56,69 @@ def getChi2(input_string):
 		else:
 			return 99999
 
-	chi2 = 0
+	chi2 = 0.0
 	length = len(input_string) - ignored
 
 	for i in range(0, 26):
-		observed = count[i]
-		expected = length * FREQUENCIES[chr(i + 97)]
+		observed = float(count[i])
+		expected = float(length * FREQUENCIES[chr(i + 97)])
 		difference = observed - expected
 		chi2 += (difference*difference)/expected
 
 	return chi2
 
-scores = {}
-results = {}
+def letter_to_symbol_score(input_string):
+	letters = 0
+	symbols = 0
+	for char in input_string:
+		if char in string.ascii_uppercase or char in string.ascii_lowercase or char == " ":
+			letters += 1
+	return (letters*100)/len(input_string)
 
-for char in string.ascii_letters:
-	raw_string = binascii.unhexlify(INPUT_STRING)
+def is_string_printable(input_string):
+    for char in input_string:
+        if char not in charspace:
+            return False;
+    return True
 
-	output_string = string_xor(raw_string, ord(char))
 
-	pretty_result = re.sub(r'[\x00-\x1F]+', '', output_string)
+def detect_xor_key(input_string):
+	scores = {}
+	results = {}
 
-	scores[char] = getChi2(pretty_result)
-	results[char] = pretty_result
+	for char_int in range(0,255):
+		char = chr(char_int)
+		raw_string = binascii.unhexlify(input_string)
 
-sorted_scores = dict(sorted(scores.items(), key=lambda item: item[1])[:1])
+		output_string = string_xor(raw_string, ord(char))
 
-for key in sorted_scores.keys():
-	print(key + " : " + results[key])
+		# for punc_char in string.punctuation:
+			
+		# 	pretty_result = pretty_result.replace(punc_char, '')
+
+		pretty_result = re.sub(r'[\x00-\x1F]+', '', output_string)
+
+		if not is_string_printable(pretty_result):
+
+			continue
+
+		scores[char] = getChi2(pretty_result)
+		results[char] = pretty_result
+
+	if (len(scores) > 0):
+		sorted_scores = dict(sorted(scores.items(), key=lambda item: item[1])[:1])
+
+
+		for key in sorted_scores.keys():
+			return key, results[key], sorted_scores[key]
+	else:
+		return "NONE", "", 99999
+
+def main():
+	key, plaintext, score = detect_xor_key(INPUT_STRING)
+
+	print(key + ": " + plaintext)
+
+if __name__ == '__main__':
+	main()
+
