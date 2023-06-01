@@ -1,6 +1,9 @@
 import sys
 import base64
 import binascii
+import itertools
+from set_1_challenge_3 import *
+from set_1_challenge_5 import *
 
 def hamming_distance(str1, str2):
 	assert len(str1) == len(str2)
@@ -9,47 +12,56 @@ def hamming_distance(str1, str2):
 	hamming_distance = 0
 
 	for counter, str1_char in enumerate(str1):
-		str1_char_bits = format(ord(str1_char), '08b')
-		str2_char_bits = format(ord(str2[counter]), '08b')
+		str1_char_bits = format(str1_char, '08b')
+		str2_char_bits = format(str2[counter], '08b')
 
 		for bit_counter, str1_char_bit in enumerate(str1_char_bits):
-
 			if str1_char_bit != str2_char_bits[bit_counter]:
 				hamming_distance = hamming_distance + 1
 
 	return hamming_distance
 
-def break_repeating_key_xor(ciphertext):
-	raw_ciphertext = base64.b64decode(ciphertext).decode('utf-8')
-
-	plaintext = ""
-
+def get_smallest_normalized_edit_distance(string):
 	keysize_dict = {}
-
+	
 	for x in range(2, 40):
-		first_part = raw_ciphertext[0:x]
-		second_part = raw_ciphertext[x:2*x]
-		third_part = raw_ciphertext[2*x:3*x]
-		fourth_part = raw_ciphertext[3*x:4*x]
+		blocks = [string[i:i+x] for i in range(0, len(string), x)][0:5]
+		pairs = list(itertools.combinations(blocks, 2))
+		scores = [hamming_distance(p[0], p[1])/float(x) for p in pairs]
 
-		current_hamming_distance1 = hamming_distance(first_part, second_part)
-		current_hamming_distance2 = hamming_distance(third_part, fourth_part)
+		keysize_dict[x] = sum(scores) / len(scores)
 
-		normalized_current_hamming_distance = (current_hamming_distance1)/(x) 
+	return sorted(keysize_dict.items(), key=lambda x:x[1])[0][0]
 
-		keysize_dict[x] = normalized_current_hamming_distance
+def get_transposed_blocks(ciphertext, current_potential_keysize):
+	transposed_blocks = [b'']*current_potential_keysize
 
-	print(sorted(keysize_dict.items(), key=lambda x:x[1])[0][0])
-	print(sorted(keysize_dict.items(), key=lambda x:x[1])[1][0])
-	print(sorted(keysize_dict.items(), key=lambda x:x[1])[2][0])
-	print(sorted(keysize_dict.items(), key=lambda x:x[1])[3][0])
-	print(sorted(keysize_dict.items(), key=lambda x:x[1])[4][0])
+	counter = 0
+	while counter < len(ciphertext):
+		transposed_blocks[counter%current_potential_keysize] = transposed_blocks[counter%current_potential_keysize] + bytes([ciphertext[counter]])
+		counter = counter + 1
 
-	return plaintext
+	return transposed_blocks
+
+def break_repeating_key_xor(ciphertext):
+	raw_ciphertext = base64.b64decode(ciphertext)
+
+	potential_keysize = get_smallest_normalized_edit_distance(raw_ciphertext)
+
+	transposed_blocks = get_transposed_blocks(raw_ciphertext, potential_keysize)
+
+	key = b''
+	score = 0.0
+	for block in transposed_blocks:
+		block_key, block_plaintext, block_score = detect_xor_key(block)
+		key = key + block_key.encode()
+		score = score + block_score
+
+	return binascii.unhexlify(repeated_xor_encrypt(raw_ciphertext, key))
 
 if __name__ == '__main__':
 
-	assert hamming_distance("this is a test", "wokka wokka!!!") == 37
+	assert hamming_distance(b'this is a test', b'wokka wokka!!!') == 37
 
 	ciphertext_file = open("challenges/files/6.txt")
 
@@ -62,4 +74,4 @@ if __name__ == '__main__':
 
 	plaintext = break_repeating_key_xor(ciphertext)
 
-	print(plaintext)
+	print(plaintext.decode("ascii"))
