@@ -1,4 +1,4 @@
-import set_1_challenge_3 as challenge_3
+import set_1_challenge_03 as challenge_3
 
 file = open("./challenges/files/4.txt", "r")
 lines = file.readlines()

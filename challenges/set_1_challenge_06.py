@@ -2,8 +2,8 @@ import sys
 import base64
 import binascii
 import itertools
-from set_1_challenge_3 import *
-from set_1_challenge_5 import *
+from set_1_challenge_03 import *
+from set_1_challenge_05 import *
 
 def hamming_distance(str1, str2):
 	assert len(str1) == len(str2)
@@ -57,7 +57,7 @@ def break_repeating_key_xor(ciphertext):
 		key = key + block_key.encode()
 		score = score + block_score
 
-	return binascii.unhexlify(repeated_xor_encrypt(raw_ciphertext, key))
+	return binascii.unhexlify(0)
 
 if __name__ == '__main__':
 

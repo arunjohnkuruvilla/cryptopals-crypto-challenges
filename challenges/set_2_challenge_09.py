@@ -1,5 +1,3 @@
-
-
 def pkcs07_pad(input_string, block_size = 16):
 	padding_size = block_size - len(input_string)%block_size
 	
