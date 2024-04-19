@@ -9,4 +9,4 @@ if __name__ == "__main__":
 
 	OUTPUT_STRING = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t"
 
-	assert OUTPUT_STRING.encode("ascii") == get_base64_string_from_hex_encoded_string(INPUT_STRING)
+	assert OUTPUT_STRING == get_base64_string_from_hex_encoded_string(INPUT_STRING).decode("ascii")
