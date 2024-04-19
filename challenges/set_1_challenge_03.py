@@ -2,8 +2,6 @@ import binascii
 import re
 import string
 
-INPUT_STRING = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
-
 FREQUENCIES = { 
 	'a': 0.0651738,
     'b': 0.0124248,
@@ -36,18 +34,17 @@ FREQUENCIES = {
 
 charspace = string.ascii_letters + string.digits + ",.' :\n"
 
-def string_xor(input_string, int_key):
-	return ''.join(map(lambda x: chr(x ^ int_key), input_string))
+def single_byte_xor(input_string, key):
+	return ''.join(map(lambda x: chr(x ^ ord(key)), input_string))
 
-def detect_xor_key(raw_string):
+def detect_xor_key(ciphertext):
 	scores = {}
 	results = {}
-	# print(raw_string)
 
 	for char_int in range(0,256):
 		char = chr(char_int)
 
-		output_string = string_xor(raw_string, ord(char))
+		output_string = single_byte_xor(ciphertext, char)
 
 		score = 0.0
 
@@ -68,7 +65,10 @@ def detect_xor_key(raw_string):
 		return "NONE", "", 99999
 
 def main():
-	key, plaintext, score = detect_xor_key(binascii.unhexlify(INPUT_STRING))
+	INPUT_STRING = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
+	RAW_INPUT_STRING = binascii.unhexlify(INPUT_STRING)
+	
+	key, plaintext, score = detect_xor_key(RAW_INPUT_STRING)
 
 	print(key + ": " + plaintext)
 
