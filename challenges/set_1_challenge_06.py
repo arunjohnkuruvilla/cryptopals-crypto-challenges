@@ -1,13 +1,10 @@
-import sys
 import base64
-import binascii
 import itertools
-from set_1_challenge_03 import *
-from set_1_challenge_05 import *
+import set_1_challenge_03 as challenge_03
+import set_1_challenge_05 as challenge_05
 
 def hamming_distance(str1, str2):
 	assert len(str1) == len(str2)
-		# raise Exception("Length of " + str1 + " is not equal to " + str2)
 
 	hamming_distance = 0
 
@@ -50,18 +47,23 @@ def break_repeating_key_xor(ciphertext):
 
 	transposed_blocks = get_transposed_blocks(raw_ciphertext, potential_keysize)
 
-	key = b''
+	key = ''
 	score = 0.0
+
 	for block in transposed_blocks:
-		block_key, block_plaintext, block_score = detect_xor_key(block)
-		key = key + block_key.encode()
+		block_key, block_plaintext, block_score = challenge_03.detect_xor_key(block)
+		key = key + block_key
 		score = score + block_score
 
-	return binascii.unhexlify(0)
+	return key
 
 if __name__ == '__main__':
 
-	assert hamming_distance(b'this is a test', b'wokka wokka!!!') == 37
+	HAMMING_DISTANCE_STRING_1 = 'this is a test'
+	
+	HAMMING_DISTANCE_STRING_2 = 'wokka wokka!!!'
+
+	assert hamming_distance(HAMMING_DISTANCE_STRING_1.encode('utf-8'), HAMMING_DISTANCE_STRING_2.encode('utf-8')) == 37
 
 	ciphertext_file = open("challenges/files/6.txt")
 
@@ -72,6 +74,11 @@ if __name__ == '__main__':
 	for line in ciphertext_file_contents:
 		ciphertext = ciphertext + line.strip()
 
-	plaintext = break_repeating_key_xor(ciphertext)
+	raw_ciphertext = base64.b64decode(ciphertext)
 
-	print(plaintext.decode("ascii"))
+	key = break_repeating_key_xor(ciphertext)
+
+	plaintext_bytes = challenge_05.repeated_xor_encrypt(raw_ciphertext.decode('utf-8'), key)
+
+	print("Key: " + key)
+	print("Plaintext: \n" + plaintext_bytes.decode('utf-8'))
