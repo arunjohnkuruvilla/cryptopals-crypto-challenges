@@ -1,10 +1,6 @@
 import binascii
 
 def xor(sequence_1, sequence_2):
-	
-	if len(sequence_1) != len(sequence_2):
-		raise Exception("Inputs are of unequal length")
-	
 	return bytes(a ^ b for a, b in zip(sequence_1, sequence_2))
 
 if __name__ == "__main__":
