@@ -20,13 +20,12 @@ def main():
 	for line in ciphertext_file_contents:
 		raw_ciphertext_line = binascii.unhexlify(line.rstrip())
 
-		status = detect_ecb_encryption(raw_ciphertext_line)
-
-		if status:
-			print(lineNumber)
+		if detect_ecb_encryption(raw_ciphertext_line):
 			break
 
 		lineNumber += 1
+	
+	print("Line #" + str(lineNumber))
 
 if __name__ == '__main__':
 	main()
