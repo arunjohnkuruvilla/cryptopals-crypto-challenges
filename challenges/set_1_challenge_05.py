@@ -12,7 +12,9 @@ def repeated_xor_encrypt(plaintext, key):
 	for counter, char in enumerate(plaintext):
 		current_key_char = key[counter%key_length]
 
-		current_ciphertext_char = challenge_2.xor(char.encode('utf-8'), current_key_char.encode('utf-8'))
+		print(type(char))
+		print(type(current_key_char))
+		current_ciphertext_char = challenge_2.xor(char, current_key_char)
 
 		ciphertext = ciphertext + current_ciphertext_char
 
