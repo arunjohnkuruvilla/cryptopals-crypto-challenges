@@ -1,17 +1,20 @@
 def pkcs07_unpad(input_string, block_size = 16):
-	padding_size = input_string[-1]
+    padding_size = input_string[-1]
 
-	padding = input_string[(len(input_string) - padding_size):]
+    padding = input_string[(len(input_string) - padding_size):]
 
-	padding_found = True
+    padding_found = True
 
-	for char in padding:
-		if char != padding_size:
-			raise Exception("Invalid Padding")
+    if padding_size < block_size:
+        for char in padding:
+            if char != padding_size:
+                raise Exception("Invalid Padding")
 
-	if padding_found:
-		return input_string[:-padding_size]
-	return input_string
+        if padding_found:
+            return input_string[:-padding_size]
+
+    else:
+        return input_string     
 
 def main():
     assert pkcs07_unpad(b'ICE ICE BABY\x04\x04\x04\x04') == b'ICE ICE BABY'

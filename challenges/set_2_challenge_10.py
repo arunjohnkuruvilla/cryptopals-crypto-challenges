@@ -13,18 +13,18 @@ def aes_cbc_decrypt(ciphertext, key, iv, block_size = 16):
 
 	current_iv = iv
 
-	plaintext_hex = b''
+	plaintext = b''
 
 	for counter, ciphertext_block in enumerate(ciphertext_blocks):
 		current_intermediate = challenge_07.aes_ecb_decrypt(ciphertext_block, key)
 
-		plaintext_hex += challenge_02.xor(current_intermediate, current_iv)
+		plaintext += challenge_02.xor(current_intermediate, current_iv)
 
 		current_iv = ciphertext_block
 
 	# Add implementation for PKCS#07 unpadding
 
-	return plaintext_hex
+	return plaintext
 
 def aes_cbc_encrypt(plaintext, key, iv, block_size = 16):
 	if len(key) != len(iv):
@@ -40,7 +40,7 @@ def aes_cbc_encrypt(plaintext, key, iv, block_size = 16):
 
 		current_intermediate = challenge_02.xor(plaintext_block, current_iv)
 
-		current_ciphertext = challenge_07.aes_ecb_decrypt(current_intermediate, key)
+		current_ciphertext = challenge_07.aes_ecb_encrypt(current_intermediate, key)
 
 		ciphertext += current_ciphertext
 
