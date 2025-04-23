@@ -9,7 +9,7 @@ import set_2_challenge_10 as challenge_10
 import set_2_challenge_15 as challenge_15
 
 
-class CBCOrable:
+class CBCOracle:
     def __init__(self):
         self._block_size = 16
         self._iv = random.randbytes(self._block_size)
@@ -44,7 +44,7 @@ class CBCOrable:
 
 
 def main():
-    cbc_oracle = CBCOrable()
+    cbc_oracle = CBCOracle()
 
     # TODO - Compute this dynamically
     block_size = cbc_oracle._block_size

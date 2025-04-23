@@ -1,3 +1,24 @@
+def is_pkcs07_padded(input_string, block_size = 16):
+    padding_size = input_string[-1]
+
+    padding = input_string[(len(input_string) - padding_size):]
+
+    padding_found = True
+
+    if padding_size == 0:
+        return False
+        
+    if padding_size <= block_size:
+        for char in padding:
+            if char != padding_size:
+                padding_found = False
+
+        if padding_found:
+            return True
+
+    return False
+
+
 def pkcs07_unpad(input_string, block_size = 16):
     padding_size = input_string[-1]
 
@@ -6,13 +27,11 @@ def pkcs07_unpad(input_string, block_size = 16):
     padding_found = True
 
     if padding_size < block_size:
-        for char in padding:
-            if char != padding_size:
-                raise Exception("Invalid Padding")
-
-        if padding_found:
+        if is_pkcs07_padded(input_string, block_size):
             return input_string[:-padding_size]
-
+        else:
+            raise Exception("Invalid Padding")
+        
     else:
         return input_string     
 
