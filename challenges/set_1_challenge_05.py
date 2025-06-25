@@ -3,6 +3,22 @@ import base64
 import binascii
 import set_1_challenge_02 as challenge_2
 
+def repeated_xor(plaintext, key):
+
+	key_length = len(key)
+
+	result = b''
+
+	plaintext_blocks = [plaintext[i: i + len(key)] for i in range(0, len(plaintext), len(key))]
+
+	for block in plaintext_blocks:
+
+		current_result = challenge_2.xor(block, key)
+
+		result += current_result
+
+	return result
+
 def repeated_xor_encrypt(plaintext, key):
 
 	key_length = len(key)
@@ -13,7 +29,7 @@ def repeated_xor_encrypt(plaintext, key):
 		current_key_char = key[counter%key_length]
 
 		print(type(char))
-		print(type(current_key_char))
+		# print(type(current_key_char))
 		current_ciphertext_char = challenge_2.xor(char, current_key_char)
 
 		ciphertext = ciphertext + current_ciphertext_char

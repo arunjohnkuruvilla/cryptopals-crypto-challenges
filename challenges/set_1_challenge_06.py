@@ -57,6 +57,22 @@ def break_repeating_key_xor(ciphertext):
 
 	return key
 
+def break_repeating_key_xor_raw(raw_ciphertext):
+
+	potential_keysize = get_smallest_normalized_edit_distance(raw_ciphertext)
+
+	transposed_blocks = get_transposed_blocks(raw_ciphertext, potential_keysize)
+
+	key = ''
+	score = 0.0
+
+	for block in transposed_blocks:
+		block_key, block_plaintext, block_score = challenge_03.detect_xor_key(block)
+		key = key + block_key
+		score = score + block_score
+
+	return key
+
 if __name__ == '__main__':
 
 	HAMMING_DISTANCE_STRING_1 = 'this is a test'
